@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import { siteInfo } from '../consts/site-info';
+import NavBar from '@components/pokemons/shared/NavBar.astro';
 
 interface Props {
   title: string;
@@ -35,7 +36,11 @@ const {
 
     <ClientRouter />
   </head>
-  <body class="bg-slate-900 text-white min-h-screen p-4">
-    <slot />
+  <body class="bg-slate-800 text-slate-100">
+    <NavBar />
+
+    <main class="mt-10 m-auto max-w-3xl">
+      <slot />
+    </main>
   </body>
 </html>
