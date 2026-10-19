@@ -12,11 +12,18 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/solid-js": "^7.1.0",
+    "@astrojs/tailwind": "^6.0.2",
+    "@iconify-json/mdi": "^1.2.3",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.4",
-    "tailwindcss": "^4.3.3"
+    "astro-icon": "^1.2.0",
+    "solid-js": "^1.9.17"
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
   }
 }
