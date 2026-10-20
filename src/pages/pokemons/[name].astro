@@ -1,18 +1,22 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import MainLayout from '../../layouts/MainLayout.astro';
-import Title from '../../components/shared/Title.astro';
-import PokemonCard from '../../components/pokemons/PokemonCard.astro';
+import type { PokemonListResponse } from '@interfaces/pokemon-list.response';
+
+import { Icon } from 'astro-icon/components';
+
+import PokemonCard from '@components/pokemons/PokemonCard.astro';
+import MainLayout from '@layouts/MainLayout.astro';
+import Title from '@components/shared/Title.astro';
 
 export const getStaticPaths = (async () => {
   const resp = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-  const { results } = (await resp.json()) as { results: { name: string; url: string }[] };
+  const { results } = (await resp.json()) as PokemonListResponse;
 
   return results.map(({ name, url }) => ({
-    params: { name },
-    props: { url },
+    params: { name: name },
+    props: { name: name, url: url },
   }));
-}) satisfies GetStaticPaths;
+});
 
 const { name } = Astro.params;
 const { url } = Astro.props;
@@ -28,10 +32,16 @@ const imageSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprit
   image={imageSrc}
 >
   <section class="mt-10 mx-10 flex flex-col justify-center items-center">
-    <div>
-      <!-- <a href="/">Regresar</a> -->
-      <button onclick="history.back()" class="text-blue-500">Regresar</button>
-      <Title>{name}</Title>
+    <div class="flex flex-row">
+      <div>
+        <button onclick="history.back()" class="text-blue-500">Regresar</button>
+        <Title>{name}</Title>
+      </div>
+
+      <button id="btn-favorite" class="ml-4" data-id={id}>
+        <Icon id="icon-outline" name="heart-outline" size={50} />
+        <Icon id="icon-full" class="hidden" name="heart-full" size={50} />
+      </button>
     </div>
 
     <PokemonCard name={name} url={url} isBig />
@@ -47,4 +57,44 @@ const imageSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprit
   a {
     @apply hover:underline text-blue-500;
   }
+
+  #btn-favorite {
+    @apply hover:animate-pulse;
+  }
 </style>
+
+<script>
+  function updateFavoriteIcon() {
+    const btnFavorite = document.querySelector("#btn-favorite");
+    if (!btnFavorite) return;
+
+    const id = btnFavorite.dataset.id;
+    const iconOutline = document.querySelector("#icon-outline");
+    const iconFull = document.querySelector("#icon-full");
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    const isFavorite = favorites.includes(id);
+
+    iconOutline.classList.toggle("hidden", isFavorite);
+    iconFull.classList.toggle("hidden", !isFavorite);
+  }
+
+  function toggleFavorite(id) {
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    const index = favorites.indexOf(id);
+    if (index === -1) {
+      favorites.push(id);
+    } else {
+      favorites.splice(index, 1);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }
+
+  document.addEventListener("astro:page-load", updateFavoriteIcon);
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("#btn-favorite");
+    if (!btn) return;
+    toggleFavorite(btn.dataset.id);
+    updateFavoriteIcon();
+  });
+</script>
