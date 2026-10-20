@@ -38,9 +38,9 @@ const imageSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprit
         <Title>{name}</Title>
       </div>
 
-      <button id="btn-favorite" class="ml-4" data-id={id}>
-        <Icon id="icon-outline" name="heart-outline" size={50} />
-        <Icon id="icon-full" class="hidden" name="heart-full" size={50} />
+      <button id="btn-favorite" class="ml-4" data-name={name} data-id={id}>
+        <Icon name="heart-outline" size={50} />
+        <Icon class="hidden" name="heart-full" size={50} />
       </button>
     </div>
 
@@ -64,37 +64,23 @@ const imageSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprit
 </style>
 
 <script>
-  function updateFavoriteIcon() {
-    const btnFavorite = document.querySelector("#btn-favorite");
+  interface FavoritePokemon {
+    name: string;
+    id: number;
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    const btnFavorite = document.querySelector(
+      '#btn-favorite'
+    ) as HTMLButtonElement;
+
     if (!btnFavorite) return;
 
+    const name = btnFavorite.dataset.name;
     const id = btnFavorite.dataset.id;
-    const iconOutline = document.querySelector("#icon-outline");
-    const iconFull = document.querySelector("#icon-full");
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    const isFavorite = favorites.includes(id);
 
-    iconOutline.classList.toggle("hidden", isFavorite);
-    iconFull.classList.toggle("hidden", !isFavorite);
-  }
-
-  function toggleFavorite(id) {
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    const index = favorites.indexOf(id);
-    if (index === -1) {
-      favorites.push(id);
-    } else {
-      favorites.splice(index, 1);
-    }
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }
-
-  document.addEventListener("astro:page-load", updateFavoriteIcon);
-
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest("#btn-favorite");
-    if (!btn) return;
-    toggleFavorite(btn.dataset.id);
-    updateFavoriteIcon();
+    btnFavorite.addEventListener('click', () => {
+      console.log({ name, id });
+    });
   });
 </script>
